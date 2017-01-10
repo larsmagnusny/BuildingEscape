@@ -21,6 +21,15 @@ void UPositionReport::BeginPlay()
 	Super::BeginPlay();
 
 	// ...
+	FString ObjectName = GetOwner()->GetName();
+
+	FTransform ObjectPositionTransform = GetOwner()->GetTransform();
+
+	FVector ObjectPositionVector = ObjectPositionTransform.GetLocation();
+
+	FString ObjectPos = "X=" + FString::SanitizeFloat(ObjectPositionVector.X) + ", Y="+FString::SanitizeFloat(ObjectPositionVector.Y)+", Z = "+FString::SanitizeFloat(ObjectPositionVector.Y);
+
+	UE_LOG(LogTemp, Warning, TEXT("%s is at %s!"), *ObjectName, *ObjectPos);
 	
 }
 
