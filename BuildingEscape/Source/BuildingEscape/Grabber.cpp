@@ -1,4 +1,4 @@
-// Fill out your copyright notice in the Description page of Project Settings.
+﻿// Fill out your copyright notice in the Description page of Project Settings.
 
 #include "BuildingEscape.h"
 #include "Grabber.h"
@@ -56,22 +56,46 @@ void UGrabber::Grab()
 	UE_LOG(LogTemp, Warning, TEXT("Grab Pressed!"));
 
 	// LINE TRACE and see if we reach any actors with physics body collision set
-	FHitResult Hit = GetFirstPhysicsBodyInReach();
+	auto HitResult = GetFirstPhysicsBodyInReach();
+	auto ComponentToGrab = HitResult.GetComponent();
+	auto ActorHit = HitResult.GetActor();
 
 	// If we hit something then attach a physics handle
-	// TODO attach physics handle
+
+	if (ActorHit)
+	{
+		// Attach physics handle
+		PhysicsHandle->GrabComponentAtLocation(
+			ComponentToGrab,
+			NAME_None,
+			ActorHit->GetActorLocation()
+		);
+	}
 }
 
 void UGrabber::Release()
 {
 	UE_LOG(LogTemp, Warning, TEXT("Grab Released!"));
 	// TODO release physics handle
+	PhysicsHandle->ReleaseComponent();
 }
 
 // Called every frame
 void UGrabber::TickComponent( float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction )
 {
 	Super::TickComponent( DeltaTime, TickType, ThisTickFunction );
+
+	FVector Location = FVector(0.0f, 0.0f, 0.0f);
+	FRotator Rotation = FRotator(0.0f, 0.0f, 0.0f);
+	GetWorld()->GetFirstPlayerController()->GetPlayerViewPoint(OUT Location, OUT Rotation);
+
+	FVector LineTraceEnd = Location + Rotation.Vector()*Reach;
+
+	if (PhysicsHandle->GrabbedComponent)
+	{
+		// move the object we're holding
+		PhysicsHandle->SetTargetLocation(LineTraceEnd);
+	}
 }
 
 
