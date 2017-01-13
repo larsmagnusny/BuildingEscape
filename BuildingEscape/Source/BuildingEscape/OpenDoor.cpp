@@ -22,6 +22,9 @@ void UOpenDoor::BeginPlay()
 	Super::BeginPlay();
 
 	Owner = GetOwner();
+
+	if (!PressurePlate)
+		UE_LOG(LogTemp, Error, TEXT("No Trigger-Volume assosiated with %s!"), *GetOwner()->GetName());
 }
 
 void UOpenDoor::OpenDoor()
@@ -64,6 +67,9 @@ float UOpenDoor::GetTotalMassOfActorsOnPlate()
 {
 	float TotalMass = 0.f;
 
+	if (!PressurePlate)
+		return TotalMass;
+	
 	// Find all the overlapping actors
 	TArray<AActor*> OverLappingActors;
 	PressurePlate->GetOverlappingActors(OUT OverLappingActors);
@@ -73,6 +79,5 @@ float UOpenDoor::GetTotalMassOfActorsOnPlate()
 		TotalMass += Actor->FindComponentByClass<UPrimitiveComponent>()->GetMass();
 	}
 	// Iterate through them adding their masses
-
 	return TotalMass;
 }
