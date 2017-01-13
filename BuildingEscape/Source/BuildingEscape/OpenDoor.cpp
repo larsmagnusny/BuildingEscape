@@ -27,20 +27,6 @@ void UOpenDoor::BeginPlay()
 		UE_LOG(LogTemp, Error, TEXT("No Trigger-Volume assosiated with %s!"), *GetOwner()->GetName());
 }
 
-void UOpenDoor::OpenDoor()
-{
-	// Set the door rotation
-	//Owner->SetActorRotation(FRotator(0.0f, OpenAngle, 0.0f));
-	OnOpenRequest.Broadcast();
-}
-
-void UOpenDoor::CloseDoor()
-{
-	// Set the door rotation
-	Owner->SetActorRotation(FRotator(0.0f, -90.0f, 0.0f));
-}
-
-
 // Called every frame
 void UOpenDoor::TickComponent( float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction )
 {
@@ -50,17 +36,12 @@ void UOpenDoor::TickComponent( float DeltaTime, ELevelTick TickType, FActorCompo
 
 	// Poll the triggervolume every Frame
 	// If the ActorThatOpens is in the volume
-	if (GetTotalMassOfActorsOnPlate() > 50.f)	// TODO make into a parameter
+	if (GetTotalMassOfActorsOnPlate() > TriggerMass)	// TODO make into a parameter
 	{
-		OpenDoor();
-		LastDoorOpenTime = GetWorld()->GetTimeSeconds();
+		OnOpen.Broadcast();
 	}
-
-	// Check if it's time to close the door
-	if (LastDoorOpenTime + DoorCloseDelay < GetWorld()->GetTimeSeconds() && LastDoorOpenTime != 0.0f)
-	{
-		CloseDoor();
-		LastDoorOpenTime = 0.0f;
+	else {
+		OnClose.Broadcast();
 	}
 }
 
